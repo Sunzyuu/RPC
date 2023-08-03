@@ -1,4 +1,4 @@
-package com.github.rpc.remoting.socket;
+package com.github.test.remoting.socket;
 
 import java.io.Serializable;
 

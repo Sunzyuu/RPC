@@ -1,10 +1,10 @@
-package com.github.rpc.remoting.netty.server;
+package com.github.test.remoting.netty.server;
 
-import com.github.rpc.remoting.netty.codec.NettyKryoDecoder;
-import com.github.rpc.remoting.netty.codec.NettyKryoEncoder;
-import com.github.rpc.remoting.netty.dto.RpcRequest;
-import com.github.rpc.remoting.netty.dto.RpcResponse;
-import com.github.rpc.remoting.netty.serialize.KryoSerializer;
+import com.github.test.remoting.netty.codec.NettyKryoDecoder;
+import com.github.test.remoting.netty.codec.NettyKryoEncoder;
+import com.github.test.remoting.netty.dto.RpcRequest;
+import com.github.test.remoting.netty.dto.RpcResponse;
+import com.github.test.remoting.netty.serialize.KryoSerializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -36,6 +36,7 @@ public class NettyServer {
 
         try {
             ServerBootstrap b = new ServerBootstrap();
+            // Bootstrap是Netty用于创建服务器的引导类，它负责设置服务器的各种参数和配置
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     // TCP默认开启了 Nagle 算法，该算法的作用是尽可能的发送大数据快，减少网络传输。TCP_NODELAY 参数的作用就是控制是否启用 Nagle 算法。
@@ -45,6 +46,9 @@ public class NettyServer {
                     //表示系统用于临时存放已完成三次握手的请求的队列的最大长度,如果连接建立频繁，服务器处理创建新连接较慢，可以适当调大这个参数
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .handler(new LoggingHandler(LogLevel.INFO))
+                    // 添加ChannelHandler：通过childHandler方法设置ChannelInitializer，
+                    // 它会为每个新的客户端连接创建一个ChannelPipeline，并添加对应的ChannelHandler。
+                    // 在这里，添加了NettyKryoDecoder和NettyKryoEncoder用于进行序列化和反序列化，以及NettyServerHandler用于处理RPC请求。
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) {

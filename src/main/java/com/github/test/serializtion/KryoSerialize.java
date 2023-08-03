@@ -1,4 +1,4 @@
-package com.github.rpc.serializtion;
+package com.github.test.serializtion;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;

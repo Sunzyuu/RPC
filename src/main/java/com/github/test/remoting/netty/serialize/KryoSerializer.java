@@ -1,10 +1,10 @@
-package com.github.rpc.remoting.netty.serialize;
+package com.github.test.remoting.netty.serialize;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import com.github.rpc.remoting.netty.dto.RpcRequest;
-import com.github.rpc.remoting.netty.dto.RpcResponse;
+import com.github.test.remoting.netty.dto.RpcRequest;
+import com.github.test.remoting.netty.dto.RpcResponse;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

@@ -1,6 +1,6 @@
-package com.github.rpc.remoting.netty.codec;
+package com.github.test.remoting.netty.codec;
 
-import com.github.rpc.remoting.netty.serialize.Serializer;
+import com.github.test.remoting.netty.serialize.Serializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;

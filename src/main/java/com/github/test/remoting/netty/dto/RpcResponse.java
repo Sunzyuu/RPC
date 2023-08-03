@@ -1,4 +1,4 @@
-package com.github.rpc.remoting.netty.dto;
+package com.github.test.remoting.netty.dto;
 
 import lombok.*;
 

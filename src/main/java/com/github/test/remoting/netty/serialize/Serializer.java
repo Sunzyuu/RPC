@@ -1,4 +1,4 @@
-package com.github.rpc.remoting.netty.serialize;
+package com.github.test.remoting.netty.serialize;
 
 /**
  * @author sunzy

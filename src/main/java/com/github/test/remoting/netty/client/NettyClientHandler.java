@@ -1,6 +1,6 @@
-package com.github.rpc.remoting.netty.client;
+package com.github.test.remoting.netty.client;
 
-import com.github.rpc.remoting.netty.dto.RpcResponse;
+import com.github.test.remoting.netty.dto.RpcResponse;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.AttributeKey;

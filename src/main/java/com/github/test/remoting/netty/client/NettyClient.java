@@ -1,10 +1,10 @@
-package com.github.rpc.remoting.netty.client;
+package com.github.test.remoting.netty.client;
 
-import com.github.rpc.remoting.netty.codec.NettyKryoDecoder;
-import com.github.rpc.remoting.netty.codec.NettyKryoEncoder;
-import com.github.rpc.remoting.netty.dto.RpcRequest;
-import com.github.rpc.remoting.netty.dto.RpcResponse;
-import com.github.rpc.remoting.netty.serialize.KryoSerializer;
+import com.github.test.remoting.netty.codec.NettyKryoDecoder;
+import com.github.test.remoting.netty.codec.NettyKryoEncoder;
+import com.github.test.remoting.netty.dto.RpcRequest;
+import com.github.test.remoting.netty.dto.RpcResponse;
+import com.github.test.remoting.netty.serialize.KryoSerializer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -84,6 +84,7 @@ public class NettyClient {
                 .interfaceName("interface")
                 .methodName("hello").build();
         NettyClient nettyClient = new NettyClient("127.0.0.1", 8889);
+        // 客户端向服务器发起三次RPC请求
         for (int i = 0; i < 3; i++) {
             nettyClient.sendMessage(rpcRequest);
         }
