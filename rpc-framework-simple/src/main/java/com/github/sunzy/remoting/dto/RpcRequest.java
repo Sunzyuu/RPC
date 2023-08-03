@@ -22,12 +22,13 @@ public class RpcRequest implements Serializable {
     private String interfaceName;
     private String methodName;
     private Object[] parameters;
-    private Class<?> paramTypes;
-//    private RpcMessageType  rpcMessageType;
+    private Class<?>[] paramTypes;
     private String version;
     private String group;
 
-//    public
+    public String getRpcServiceName() {
+        return this.getInterfaceName() + this.getGroup() + this.getVersion();
+    }
 
 
 }
