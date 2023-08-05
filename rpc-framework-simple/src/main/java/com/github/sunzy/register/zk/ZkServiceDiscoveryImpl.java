@@ -3,10 +3,14 @@ package com.github.sunzy.register.zk;
 import com.github.sunzy.loadbalance.LoadBalance;
 import com.github.sunzy.loadbalance.loadbalancer.RandomLoadBalance;
 import com.github.sunzy.register.ServiceDiscovery;
+import com.github.sunzy.register.zk.util.CuratorUtils;
 import com.github.sunzy.remoting.dto.RpcRequest;
+import com.github.sunzy.utils.CollectionUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.curator.framework.CuratorFramework;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 
 /**
  * @author sunzy
@@ -23,7 +27,18 @@ public class ZkServiceDiscoveryImpl implements ServiceDiscovery {
     @Override
     public InetSocketAddress lookupService(RpcRequest rpcRequest) {
         String rpcServiceName = rpcRequest.getRpcServiceName();
+        CuratorFramework zkClient = CuratorUtils.getZkClient();
+        List<String> serviceUrlList = CuratorUtils.getChildrenNodes(zkClient, rpcServiceName);
+        if(CollectionUtil.isEmpty(serviceUrlList)) {
+            throw new IllegalArgumentException("服务列表为空");
+        }
 
-        return null;
+        String targetServiceUrl = loadBalance.selectServiceAddress(serviceUrlList, rpcRequest);
+        log.info("Successfully found the service address:[{}]", targetServiceUrl);
+        String[] socketAddressArray = targetServiceUrl.split(":");
+        String host = socketAddressArray[0];
+        int port = Integer.parseInt(socketAddressArray[1]);
+        return new InetSocketAddress(host, port);
+
     }
 }
