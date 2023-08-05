@@ -2,10 +2,12 @@ package com.github.sunzy.provider.impl;
 
 import com.github.sunzy.config.RpcServiceConfig;
 import com.github.sunzy.provider.ServiceProvider;
+import com.github.sunzy.register.ServiceRegistry;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author sunzy
@@ -15,13 +17,21 @@ import java.util.Set;
 public class ZkServiceProviderImpl implements ServiceProvider {
 
 
+    /**
+     * key: rpc service name (interface name + version + group)
+     * value: service object
+     */
     private final Map<String, Object> serviceMap;
 
     private final Set<String> registeredService;
 
-    public ZkServiceProviderImpl(Map<String, Object> serviceMap, Set<String> registeredService) {
-        this.serviceMap = serviceMap;
-        this.registeredService = registeredService;
+    private final ServiceRegistry serviceRegistry;
+
+
+    public ZkServiceProviderImpl() {
+        serviceMap = new ConcurrentHashMap<>();
+        registeredService = ConcurrentHashMap.newKeySet();
+        this.serviceRegistry = serviceRegistry;
     }
 
     //    private final ServiceRegistry
