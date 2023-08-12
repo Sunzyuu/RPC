@@ -1,17 +1,21 @@
 package com.github.sunzy.remoting.transport.netty.codec;
 
+import com.github.sunzy.compress.Compress;
 import com.github.sunzy.enums.CompressTypeEnum;
+import com.github.sunzy.enums.SerializationTypeEnum;
 import com.github.sunzy.extension.ExtensionLoader;
 import com.github.sunzy.remoting.constants.RpcConstants;
 import com.github.sunzy.remoting.dto.RpcMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 
+@Slf4j
 public class RpcMessageDecoder extends LengthFieldBasedFrameDecoder {
 
     public RpcMessageDecoder() {
@@ -81,11 +85,24 @@ public class RpcMessageDecoder extends LengthFieldBasedFrameDecoder {
             byte[] bs = new byte[bodyLength];
             in.readBytes(bs);
             // decompress the bytes
-//            String compressName = CompressTypeEnum.getName(compressType);
-//            ExtensionLoader.getExtensionLoader(Compress.class)
-        }
+            String compressName = CompressTypeEnum.getName(compressType);
+            Compress compress = ExtensionLoader.getExtensionLoader(Compress.class).getExtension(compressName);
 
-        return null;
+            bs = compress.decompress(bs);
+            // deserialize the object
+            String codecName = SerializationTypeEnum.getName(rpcMessage.getCodec());
+            log.info("codec name: [{}] ", codecName);
+//            Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class)
+//                    .getExtension(codecName);
+//            if (messageType == RpcConstants.REQUEST_TYPE) {
+//                RpcRequest tmpValue = serializer.deserialize(bs, RpcRequest.class);
+//                rpcMessage.setData(tmpValue);
+//            } else {
+//                RpcResponse tmpValue = serializer.deserialize(bs, RpcResponse.class);
+//                rpcMessage.setData(tmpValue);
+//            }
+        }
+        return rpcMessage;
     }
 
     private void checkVersion(ByteBuf in) {
