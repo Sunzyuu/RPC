@@ -39,11 +39,11 @@ public class RpcMessageDecoder extends LengthFieldBasedFrameDecoder {
         if(decoded instanceof ByteBuf) {
             ByteBuf frame = (ByteBuf) decoded;
             if(frame.readableBytes() >= RpcConstants.TOTAL_LENGTH) {
-                try {
+//                try {
                     return decodeFrame(frame);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
             }
         }
 
