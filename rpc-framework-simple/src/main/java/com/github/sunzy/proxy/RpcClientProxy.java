@@ -1,9 +1,14 @@
 package com.github.sunzy.proxy;
 
 import com.github.sunzy.config.RpcServiceConfig;
+import com.github.sunzy.enums.RpcErrorMessageEnum;
+import com.github.sunzy.enums.RpcResponseCodeEnum;
+import com.github.sunzy.exception.RpcException;
 import com.github.sunzy.remoting.dto.RpcRequest;
 import com.github.sunzy.remoting.dto.RpcResponse;
 import com.github.sunzy.remoting.transport.RpcRequestTransport;
+import com.github.sunzy.remoting.transport.netty.client.NettyRpcClient;
+import com.github.sunzy.remoting.transport.socket.SocketRpcClient;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -11,6 +16,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author sunzy
@@ -55,16 +61,31 @@ public class RpcClientProxy implements InvocationHandler {
                 .version(rpcServiceConfig.getVersion())
                 .build();
         RpcResponse<Object> rpcResponse = null;
-//        if (rpcRequestTransport instanceof NettyRpcClient) {
-//            CompletableFuture<RpcResponse<Object>> completableFuture = (CompletableFuture<RpcResponse<Object>>) rpcRequestTransport.sendRpcRequest(rpcRequest);
-//            rpcResponse = completableFuture.get();
-//        }
-//        if (rpcRequestTransport instanceof SocketRpcClient) {
-//            rpcResponse = (RpcResponse<Object>) rpcRequestTransport.sendRpcRequest(rpcRequest);
-//        }
-//        this.check(rpcResponse, rpcRequest);
+        if (rpcRequestTransport instanceof NettyRpcClient) {
+            CompletableFuture<RpcResponse<Object>> completableFuture = (CompletableFuture<RpcResponse<Object>>) rpcRequestTransport.sendRpcRequest(rpcRequest);
+            rpcResponse = completableFuture.get();
+        }
+        if (rpcRequestTransport instanceof SocketRpcClient) {
+            rpcResponse = (RpcResponse<Object>) rpcRequestTransport.sendRpcRequest(rpcRequest);
+        }
+        this.check(rpcResponse, rpcRequest);
         return rpcResponse.getData();
     }
 
-//    private void check()
+    private void check(RpcResponse<Object> rpcResponse, RpcRequest rpcRequest) {
+        if (rpcResponse == null) {
+            throw new RpcException(RpcErrorMessageEnum.SERVICE_INVOCATION_FAILURE, INTERFACE_NAME + ":" + rpcRequest.getInterfaceName());
+        }
+
+        if (!rpcRequest.getRequestId().equals(rpcResponse.getRequestId())) {
+            throw new RpcException(RpcErrorMessageEnum.REQUEST_NOT_MATCH_RESPONSE, INTERFACE_NAME + ":" + rpcRequest.getInterfaceName());
+        }
+
+        if(rpcResponse.getCode() == null || !rpcResponse.getCode().equals(RpcResponseCodeEnum.SUCCESS.getCode())) {
+            throw new RpcException(RpcErrorMessageEnum.SERVICE_INVOCATION_FAILURE, INTERFACE_NAME + ":" + rpcRequest.getInterfaceName());
+        }
+
+
+    }
+
 }
