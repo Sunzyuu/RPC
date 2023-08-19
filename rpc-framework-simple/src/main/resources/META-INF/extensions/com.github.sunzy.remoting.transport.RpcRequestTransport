@@ -1,0 +1,2 @@
+netty=com.github.sunzy.remoting.transport.netty.client.NettyRpcClient
+socket=com.github.sunzy.remoting.transport.socket.SocketRpcClient

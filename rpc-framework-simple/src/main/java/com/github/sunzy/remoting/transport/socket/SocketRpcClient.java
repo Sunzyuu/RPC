@@ -2,13 +2,12 @@ package com.github.sunzy.remoting.transport.socket;
 
 import com.github.sunzy.enums.ServiceDiscoveryEnum;
 import com.github.sunzy.extension.ExtensionLoader;
-import com.github.sunzy.register.ServiceDiscovery;
+import com.github.sunzy.registry.ServiceDiscovery;
 import com.github.sunzy.remoting.dto.RpcRequest;
 import com.github.sunzy.remoting.transport.RpcRequestTransport;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;

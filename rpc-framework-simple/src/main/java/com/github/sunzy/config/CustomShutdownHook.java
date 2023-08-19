@@ -1,6 +1,6 @@
 package com.github.sunzy.config;
 
-import com.github.sunzy.register.zk.util.CuratorUtils;
+import com.github.sunzy.registry.zk.util.CuratorUtils;
 import com.github.sunzy.remoting.transport.netty.server.NettyRpcServer;
 import com.github.sunzy.utils.concurrent.ThreadPoolFactoryUtil;
 import lombok.extern.slf4j.Slf4j;

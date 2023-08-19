@@ -1,6 +1,8 @@
 package com.github.sunzy.remoting.handler;
 
+import com.github.sunzy.factory.SingletonFactory;
 import com.github.sunzy.provider.ServiceProvider;
+import com.github.sunzy.provider.impl.ZkServiceProviderImpl;
 import com.github.sunzy.remoting.dto.RpcRequest;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,8 +18,8 @@ public class RpcRequestHandler {
 
     private final ServiceProvider serviceProvider;
 
-    public RpcRequestHandler(ServiceProvider serviceProvider) {
-        this.serviceProvider = serviceProvider;
+    public RpcRequestHandler() {
+        serviceProvider = SingletonFactory.getInstance(ZkServiceProviderImpl.class);
     }
 
     public Object handle(RpcRequest request) {

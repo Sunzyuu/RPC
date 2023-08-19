@@ -12,6 +12,9 @@
         <module>rpc-framework-simple</module>
         <module>test</module>
         <module>rpc-framework-common</module>
+        <module>example-client</module>
+        <module>service</module>
+        <module>example-server</module>
     </modules>
     <properties>
         <encoding>UTF-8</encoding>

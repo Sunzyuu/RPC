@@ -4,10 +4,12 @@ import com.github.sunzy.config.RpcServiceConfig;
 import com.github.sunzy.enums.ServiceRegistryEnum;
 import com.github.sunzy.extension.ExtensionLoader;
 import com.github.sunzy.provider.ServiceProvider;
-import com.github.sunzy.register.ServiceRegistry;
+import com.github.sunzy.registry.ServiceRegistry;
+import com.github.sunzy.remoting.transport.netty.server.NettyRpcServer;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.Set;
@@ -64,6 +66,7 @@ public class ZkServiceProviderImpl implements ServiceProvider {
         try {
             String host = InetAddress.getLocalHost().getHostAddress();
             this.addService(rpcServiceConfig);
+            serviceRegistry.registerService(rpcServiceConfig.getRpcServiceName(), new InetSocketAddress(host, NettyRpcServer.PORT));
         } catch (UnknownHostException e) {
             log.error("occur exception when get host address", e);
         }

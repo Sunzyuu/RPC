@@ -1,4 +1,4 @@
-package com.github.sunzy.register;
+package com.github.sunzy.registry;
 
 import com.github.sunzy.extension.SPI;
 

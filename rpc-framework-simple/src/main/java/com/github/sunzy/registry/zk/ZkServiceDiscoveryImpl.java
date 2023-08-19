@@ -1,9 +1,9 @@
-package com.github.sunzy.register.zk;
+package com.github.sunzy.registry.zk;
 
 import com.github.sunzy.loadbalance.LoadBalance;
 import com.github.sunzy.loadbalance.loadbalancer.RandomLoadBalance;
-import com.github.sunzy.register.ServiceDiscovery;
-import com.github.sunzy.register.zk.util.CuratorUtils;
+import com.github.sunzy.registry.ServiceDiscovery;
+import com.github.sunzy.registry.zk.util.CuratorUtils;
 import com.github.sunzy.remoting.dto.RpcRequest;
 import com.github.sunzy.utils.CollectionUtil;
 import lombok.extern.slf4j.Slf4j;

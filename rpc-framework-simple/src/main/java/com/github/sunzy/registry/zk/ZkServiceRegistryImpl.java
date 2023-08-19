@@ -1,7 +1,7 @@
-package com.github.sunzy.register.zk;
+package com.github.sunzy.registry.zk;
 
-import com.github.sunzy.register.ServiceRegistry;
-import com.github.sunzy.register.zk.util.CuratorUtils;
+import com.github.sunzy.registry.ServiceRegistry;
+import com.github.sunzy.registry.zk.util.CuratorUtils;
 import org.apache.curator.framework.CuratorFramework;
 
 import java.net.InetSocketAddress;

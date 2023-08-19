@@ -1,0 +1,3 @@
+kyro=com.github.sunzy.serialize.kyro.KryoSerializer
+protostuff=com.github.sunzy.serialize.protostuff.ProtostuffSerializer
+hessian=com.github.sunzy.serialize.hessian.HessianSerializer

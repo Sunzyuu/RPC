@@ -20,6 +20,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 @Slf4j
 public final class ExtensionLoader<T> {
+
     private static final String SERVICE_DIRECTORY = "META-INF/extensions/";
     private static final Map<Class<?>, ExtensionLoader<?>> EXTENSION_LOADERS = new ConcurrentHashMap<>();
     private static final Map<Class<?>, Object> EXTENSION_INSTANCES = new ConcurrentHashMap<>();
@@ -52,22 +53,22 @@ public final class ExtensionLoader<T> {
     }
 
     public T getExtension(String name) {
-        if(StringUtil.isBlank(name)) {
-
+        if (StringUtil.isBlank(name)) {
+            throw new IllegalArgumentException("Extension name should not be null or empty.");
         }
-
+        // firstly get from cache, if not hit, create one
         Holder<Object> holder = cachedInstances.get(name);
-        if(holder == null) {
+        if (holder == null) {
             cachedInstances.putIfAbsent(name, new Holder<>());
             holder = cachedInstances.get(name);
         }
-
+        // create a singleton if no instance exists
         Object instance = holder.get();
-        if(instance ==null) {
-            synchronized(holder) {
+        if (instance == null) {
+            synchronized (holder) {
                 instance = holder.get();
                 if (instance == null) {
-                    instance = createInstance(name);
+                    instance = createExtension(name);
                     holder.set(instance);
                 }
             }
@@ -75,14 +76,14 @@ public final class ExtensionLoader<T> {
         return (T) instance;
     }
 
-    private Object createInstance(String name) {
+    private T createExtension(String name) {
+        // load all extension classes of type T from file and get specific one by name
         Class<?> clazz = getExtensionClasses().get(name);
-        if(clazz == null) {
+        if (clazz == null) {
             throw new RuntimeException("No such extension of name " + name);
         }
         T instance = (T) EXTENSION_INSTANCES.get(clazz);
-
-        if(instance == null) {
+        if (instance == null) {
             try {
                 EXTENSION_INSTANCES.putIfAbsent(clazz, clazz.newInstance());
                 instance = (T) EXTENSION_INSTANCES.get(clazz);
@@ -94,7 +95,9 @@ public final class ExtensionLoader<T> {
     }
 
     private Map<String, Class<?>> getExtensionClasses() {
+        // get the loaded extension class from the cache
         Map<String, Class<?>> classes = cachedClasses.get();
+        // double check
         if (classes == null) {
             synchronized (cachedClasses) {
                 classes = cachedClasses.get();
@@ -113,11 +116,10 @@ public final class ExtensionLoader<T> {
         String fileName = ExtensionLoader.SERVICE_DIRECTORY + type.getName();
         try {
             Enumeration<URL> urls;
-
             ClassLoader classLoader = ExtensionLoader.class.getClassLoader();
             urls = classLoader.getResources(fileName);
-            if(urls == null) {
-                while(urls.hasMoreElements()) {
+            if (urls != null) {
+                while (urls.hasMoreElements()) {
                     URL resourceUrl = urls.nextElement();
                     loadResource(extensionClasses, classLoader, resourceUrl);
                 }
@@ -159,5 +161,4 @@ public final class ExtensionLoader<T> {
             log.error(e.getMessage());
         }
     }
-
 }
