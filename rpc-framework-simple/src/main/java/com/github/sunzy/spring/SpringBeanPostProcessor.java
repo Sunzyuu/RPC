@@ -14,6 +14,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 
@@ -22,6 +23,7 @@ import java.lang.reflect.Field;
  * date 2023-08-20
  */
 @Slf4j
+@Component
 public class SpringBeanPostProcessor implements BeanPostProcessor {
 
     private final ServiceProvider serviceProvider;
@@ -31,7 +33,6 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
         this.serviceProvider = SingletonFactory.getInstance(ZkServiceProviderImpl.class);
         this.rpcClient = ExtensionLoader.getExtensionLoader(RpcRequestTransport.class).getExtension(RpcRequestTransportEnum.NETTY.getName());
     }
-
 
     @SneakyThrows
     @Override

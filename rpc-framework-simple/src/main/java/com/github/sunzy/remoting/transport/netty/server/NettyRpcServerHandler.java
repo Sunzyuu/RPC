@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class NettyRpcServerHandler extends ChannelInboundHandlerAdapter {
+
     private final RpcRequestHandler rpcRequestHandler;
 
     public NettyRpcServerHandler() {
@@ -83,5 +84,4 @@ public class NettyRpcServerHandler extends ChannelInboundHandlerAdapter {
         cause.printStackTrace();
         ctx.close();
     }
-
 }

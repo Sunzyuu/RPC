@@ -1,5 +1,6 @@
 package com.github.sunzy.remoting.transport;
 
+import com.github.sunzy.extension.SPI;
 import com.github.sunzy.remoting.dto.RpcRequest;
 
 import java.io.IOException;
@@ -8,6 +9,7 @@ import java.io.IOException;
  * @author sunzy
  * @date 2023/8/3 21:18
  */
+@SPI
 public interface RpcRequestTransport {
     /**
      * send rpc request to server and get result

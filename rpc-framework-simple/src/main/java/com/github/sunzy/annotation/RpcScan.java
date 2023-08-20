@@ -14,4 +14,5 @@ import java.lang.annotation.*;
 @Import(CustomScannerRegistrar.class)
 @Documented
 public @interface RpcScan {
+    String[] basePackage();
 }

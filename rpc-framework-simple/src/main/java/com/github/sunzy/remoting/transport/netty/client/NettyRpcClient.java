@@ -4,6 +4,7 @@ import com.github.sunzy.enums.CompressTypeEnum;
 import com.github.sunzy.enums.SerializationTypeEnum;
 import com.github.sunzy.enums.ServiceDiscoveryEnum;
 import com.github.sunzy.extension.ExtensionLoader;
+import com.github.sunzy.extension.SPI;
 import com.github.sunzy.factory.SingletonFactory;
 import com.github.sunzy.registry.ServiceDiscovery;
 import com.github.sunzy.remoting.constants.RpcConstants;
@@ -34,16 +35,16 @@ import java.util.concurrent.TimeUnit;
  * date 2023-08-14
  */
 @Slf4j
-public class NettyRpcClient implements RpcRequestTransport {
-
+public final class NettyRpcClient implements RpcRequestTransport {
     private final ServiceDiscovery serviceDiscovery;
     private final UnprocessedRequests unprocessedRequests;
     private final ChannelProvider channelProvider;
     private final Bootstrap bootstrap;
-    // initialize resources such as EventLoopGroup, Bootstrap
-    private final EventLoopGroup eventLoopGroup = new NioEventLoopGroup();
+    private final EventLoopGroup eventLoopGroup;
 
     public NettyRpcClient() {
+        // initialize resources such as EventLoopGroup, Bootstrap
+        eventLoopGroup = new NioEventLoopGroup();
         bootstrap = new Bootstrap();
         bootstrap.group(eventLoopGroup)
                 .channel(NioSocketChannel.class)
@@ -67,6 +68,12 @@ public class NettyRpcClient implements RpcRequestTransport {
         this.channelProvider = SingletonFactory.getInstance(ChannelProvider.class);
     }
 
+    /**
+     * connect server and get the channel ,so that you can send rpc message to server
+     *
+     * @param inetSocketAddress server address
+     * @return the channel
+     */
     @SneakyThrows
     public Channel doConnect(InetSocketAddress inetSocketAddress) {
         CompletableFuture<Channel> completableFuture = new CompletableFuture<>();
@@ -82,12 +89,15 @@ public class NettyRpcClient implements RpcRequestTransport {
     }
 
     @Override
-    public Object sendRpcRequest(RpcRequest rpcRequest) throws IOException {
+    public Object sendRpcRequest(RpcRequest rpcRequest) {
+        // build return value
         CompletableFuture<RpcResponse<Object>> resultFuture = new CompletableFuture<>();
-
+        // get server address
         InetSocketAddress inetSocketAddress = serviceDiscovery.lookupService(rpcRequest);
+        // get  server address related channel
         Channel channel = getChannel(inetSocketAddress);
         if (channel.isActive()) {
+            // put unprocessed request
             unprocessedRequests.put(rpcRequest.getRequestId(), resultFuture);
             RpcMessage rpcMessage = RpcMessage.builder().data(rpcRequest)
                     .codec(SerializationTypeEnum.HESSIAN.getCode())
@@ -95,25 +105,23 @@ public class NettyRpcClient implements RpcRequestTransport {
                     .messageType(RpcConstants.REQUEST_TYPE).build();
             channel.writeAndFlush(rpcMessage).addListener((ChannelFutureListener) future -> {
                 if (future.isSuccess()) {
-                    log.info("client send message: [{}}", rpcRequest);
+                    log.info("client send message: [{}]", rpcMessage);
                 } else {
                     future.channel().close();
                     resultFuture.completeExceptionally(future.cause());
-                    log.error("send failed: ", future.cause());
+                    log.error("Send failed:", future.cause());
                 }
             });
         } else {
-            throw new RuntimeException("client send message");
+            throw new IllegalStateException();
         }
 
-
-        return null;
+        return resultFuture;
     }
-
 
     public Channel getChannel(InetSocketAddress inetSocketAddress) {
         Channel channel = channelProvider.get(inetSocketAddress);
-        if(channel == null) {
+        if (channel == null) {
             channel = doConnect(inetSocketAddress);
             channelProvider.set(inetSocketAddress, channel);
         }
