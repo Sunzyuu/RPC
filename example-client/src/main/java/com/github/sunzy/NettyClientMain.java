@@ -1,6 +1,5 @@
-package com.github;
+package com.github.sunzy;
 
-import com.github.sunzy.HelloController;
 import com.github.sunzy.annotation.RpcScan;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

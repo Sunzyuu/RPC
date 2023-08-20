@@ -1,4 +1,4 @@
-package com.github.serviceimpl;
+package com.github.sunzy.serviceimpl;
 
 import com.github.sunzy.Hello;
 import com.github.sunzy.HelloService;

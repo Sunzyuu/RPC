@@ -6,6 +6,9 @@ import com.github.sunzy.enums.SerializationTypeEnum;
 import com.github.sunzy.extension.ExtensionLoader;
 import com.github.sunzy.remoting.constants.RpcConstants;
 import com.github.sunzy.remoting.dto.RpcMessage;
+import com.github.sunzy.remoting.dto.RpcRequest;
+import com.github.sunzy.remoting.dto.RpcResponse;
+import com.github.sunzy.serialize.Serializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
@@ -23,13 +26,13 @@ public class RpcMessageDecoder extends LengthFieldBasedFrameDecoder {
     }
 
     /**
-     * @param maxFrameLength      Maximum frame length. It decide the maximum length of data that can be received.
+     * @param maxFrameLength      Maximum frame length. It decides the maximum length of data that can be received.
      *                            If it exceeds, the data will be discarded.
      * @param lengthFieldOffset   Length field offset. The length field is the one that skips the specified length of byte.
      * @param lengthFieldLength   The number of bytes in the length field.
      * @param lengthAdjustment    The compensation value to add to the value of the length field
      * @param initialBytesToStrip Number of bytes skipped.
-     *                            If you need to receive all of the header+body data, this value is 0
+     *                            If you need to receive all the header+body data, this value is 0
      *                            if you only want to receive the body data, then you need to skip the number of bytes consumed by the header.
      */
     public RpcMessageDecoder(int maxFrameLength, int lengthFieldOffset, int lengthFieldLength,
@@ -40,22 +43,26 @@ public class RpcMessageDecoder extends LengthFieldBasedFrameDecoder {
     @Override
     protected Object decode(ChannelHandlerContext ctx, ByteBuf in) throws Exception {
         Object decoded = super.decode(ctx, in);
-        if(decoded instanceof ByteBuf) {
+        if (decoded instanceof ByteBuf) {
             ByteBuf frame = (ByteBuf) decoded;
-            if(frame.readableBytes() >= RpcConstants.TOTAL_LENGTH) {
-//                try {
+            if (frame.readableBytes() >= RpcConstants.TOTAL_LENGTH) {
+                try {
                     return decodeFrame(frame);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
+                } catch (Exception e) {
+                    log.error("Decode frame error!", e);
+                    throw e;
+                } finally {
+                    frame.release();
+                }
             }
-        }
 
-        return super.decode(ctx, in);
+        }
+        return decoded;
     }
 
     private Object decodeFrame(ByteBuf in) {
-        checkMagic(in);
+        // note: must read ByteBuf in order
+        checkMagicNumber(in);
         checkVersion(in);
         int fullLength = in.readInt();
         // build RpcMessage object
@@ -75,54 +82,50 @@ public class RpcMessageDecoder extends LengthFieldBasedFrameDecoder {
             rpcMessage.setData(RpcConstants.PONG);
             return rpcMessage;
         }
-
-        if (messageType == RpcConstants.REQUEST_TYPE) {
-            rpcMessage.setData(in.readBytes(fullLength - RpcConstants.TOTAL_LENGTH));
-            return rpcMessage;
-        }
         int bodyLength = fullLength - RpcConstants.HEAD_LENGTH;
-        if(bodyLength > 0) {
+        if (bodyLength > 0) {
             byte[] bs = new byte[bodyLength];
             in.readBytes(bs);
             // decompress the bytes
             String compressName = CompressTypeEnum.getName(compressType);
-            Compress compress = ExtensionLoader.getExtensionLoader(Compress.class).getExtension(compressName);
-
+            Compress compress = ExtensionLoader.getExtensionLoader(Compress.class)
+                    .getExtension(compressName);
             bs = compress.decompress(bs);
             // deserialize the object
             String codecName = SerializationTypeEnum.getName(rpcMessage.getCodec());
             log.info("codec name: [{}] ", codecName);
-//            Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class)
-//                    .getExtension(codecName);
-//            if (messageType == RpcConstants.REQUEST_TYPE) {
-//                RpcRequest tmpValue = serializer.deserialize(bs, RpcRequest.class);
-//                rpcMessage.setData(tmpValue);
-//            } else {
-//                RpcResponse tmpValue = serializer.deserialize(bs, RpcResponse.class);
-//                rpcMessage.setData(tmpValue);
-//            }
+            Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class)
+                    .getExtension(codecName);
+            if (messageType == RpcConstants.REQUEST_TYPE) {
+                RpcRequest tmpValue = serializer.deserialize(bs, RpcRequest.class);
+                rpcMessage.setData(tmpValue);
+            } else {
+                RpcResponse tmpValue = serializer.deserialize(bs, RpcResponse.class);
+                rpcMessage.setData(tmpValue);
+            }
         }
         return rpcMessage;
+
     }
 
     private void checkVersion(ByteBuf in) {
+        // read the version and compare
         byte version = in.readByte();
-        if(version!= RpcConstants.VERSION) {
-            throw new RuntimeException("version isn't compatible");
+        if (version != RpcConstants.VERSION) {
+            throw new RuntimeException("version isn't compatible" + version);
         }
     }
 
-
-    private void checkMagic(ByteBuf in) {
+    private void checkMagicNumber(ByteBuf in) {
+        // read the first 4 bit, which is the magic number, and compare
         int len = RpcConstants.MAGIC_NUMBER.length;
         byte[] tmp = new byte[len];
         in.readBytes(tmp);
         for (int i = 0; i < len; i++) {
-            if(tmp[i] != RpcConstants.MAGIC_NUMBER[i]) {
+            if (tmp[i] != RpcConstants.MAGIC_NUMBER[i]) {
                 throw new IllegalArgumentException("Unknown magic code: " + Arrays.toString(tmp));
             }
         }
-
     }
 }
 

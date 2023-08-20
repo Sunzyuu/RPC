@@ -24,14 +24,19 @@ public class HessianSerializer implements Serializer {
         }
 
     }
+
     @Override
     public <T> T deserialize(byte[] bytes, Class<T> clazz) {
+
         try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes)) {
             HessianInput hessianInput = new HessianInput(byteArrayInputStream);
             Object o = hessianInput.readObject();
+
             return clazz.cast(o);
+
         } catch (Exception e) {
             throw new RuntimeException("Deserialization failed");
         }
+
     }
 }

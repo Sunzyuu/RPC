@@ -1,7 +1,6 @@
-package com.github;
+package com.github.sunzy;
 
-import com.github.serviceimpl.HelloServiceImpl;
-import com.github.sunzy.HelloService;
+import com.github.sunzy.serviceimpl.HelloServiceImpl;
 import com.github.sunzy.annotation.RpcScan;
 import com.github.sunzy.config.RpcServiceConfig;
 import com.github.sunzy.remoting.transport.netty.server.NettyRpcServer;
