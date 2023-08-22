@@ -24,6 +24,11 @@ public class ZkServiceDiscoveryImpl implements ServiceDiscovery {
         this.loadBalance = new RandomLoadBalance();
     }
 
+    /**
+     * 将客户端请求的服务从zookeeper中取出，进行调用
+     * @param rpcRequest
+     * @return
+     */
     @Override
     public InetSocketAddress lookupService(RpcRequest rpcRequest) {
         String rpcServiceName = rpcRequest.getRpcServiceName();
@@ -32,7 +37,7 @@ public class ZkServiceDiscoveryImpl implements ServiceDiscovery {
         if(CollectionUtil.isEmpty(serviceUrlList)) {
             throw new IllegalArgumentException("服务列表为空");
         }
-
+        // 使用负载均衡
         String targetServiceUrl = loadBalance.selectServiceAddress(serviceUrlList, rpcRequest);
         log.info("Successfully found the service address:[{}]", targetServiceUrl);
         String[] socketAddressArray = targetServiceUrl.split(":");

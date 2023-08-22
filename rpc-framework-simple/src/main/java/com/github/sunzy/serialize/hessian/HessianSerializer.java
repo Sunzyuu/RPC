@@ -31,7 +31,6 @@ public class HessianSerializer implements Serializer {
         try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes)) {
             HessianInput hessianInput = new HessianInput(byteArrayInputStream);
             Object o = hessianInput.readObject();
-
             return clazz.cast(o);
 
         } catch (Exception e) {

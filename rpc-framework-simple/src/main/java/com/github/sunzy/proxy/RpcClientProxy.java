@@ -43,15 +43,37 @@ public class RpcClientProxy implements InvocationHandler {
      */
     @SuppressWarnings("unchecked")
     public <T> T getProxy(Class<T> clazz) {
+        // 获取代理对象
         return (T) Proxy.newProxyInstance(clazz.getClassLoader(),new Class<?>[]{clazz}, this);
     }
 
 
+    /**
+     * 通过反射调用目标对象的方法
+     * @param proxy the proxy instance that the method was invoked on
+     *
+     * @param method the {@code Method} instance corresponding to
+     * the interface method invoked on the proxy instance.  The declaring
+     * class of the {@code Method} object will be the interface that
+     * the method was declared in, which may be a superinterface of the
+     * proxy interface that the proxy class inherits the method through.
+     *
+     * @param args an array of objects containing the values of the
+     * arguments passed in the method invocation on the proxy instance,
+     * or {@code null} if interface method takes no arguments.
+     * Arguments of primitive types are wrapped in instances of the
+     * appropriate primitive wrapper class, such as
+     * {@code java.lang.Integer} or {@code java.lang.Boolean}.
+     *
+     * @return
+     * @throws Throwable
+     */
     @SneakyThrows
     @SuppressWarnings("unchecked")
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         log.info("invoked method: [{}]", method.getName());
+        // 获取请求的相关信息
         RpcRequest rpcRequest = RpcRequest.builder().methodName(method.getName())
                 .parameters(args)
                 .interfaceName(method.getDeclaringClass().getName())
@@ -61,6 +83,7 @@ public class RpcClientProxy implements InvocationHandler {
                 .version(rpcServiceConfig.getVersion())
                 .build();
         RpcResponse<Object> rpcResponse = null;
+        // 根据请求信息选择不同传输方式
         if (rpcRequestTransport instanceof NettyRpcClient) {
             CompletableFuture<RpcResponse<Object>> completableFuture = (CompletableFuture<RpcResponse<Object>>) rpcRequestTransport.sendRpcRequest(rpcRequest);
             rpcResponse = completableFuture.get();

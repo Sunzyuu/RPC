@@ -40,6 +40,10 @@ public class ZkServiceProviderImpl implements ServiceProvider {
         serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getExtension(ServiceRegistryEnum.ZK.getName());
     }
 
+    /**
+     * 将服务添加到本地注册中心
+     * @param rpcServiceConfig rpc service related attributes
+     */
     @Override
     public void addService(RpcServiceConfig rpcServiceConfig) {
         String rpcServiceName = rpcServiceConfig.getRpcServiceName();
@@ -52,6 +56,11 @@ public class ZkServiceProviderImpl implements ServiceProvider {
         log.info("Add service: {} and interface:{}", rpcServiceName, rpcServiceConfig.getService().getClass().getInterfaces());
     }
 
+    /**
+     * 从注册中心中获取服务
+     * @param rpcServiceName rpc service name
+     * @return
+     */
     @Override
     public Object getService(String rpcServiceName) {
         Object service = serviceMap.get(rpcServiceName);
@@ -65,8 +74,8 @@ public class ZkServiceProviderImpl implements ServiceProvider {
     public void publishService(RpcServiceConfig rpcServiceConfig) {
         try {
             String host = InetAddress.getLocalHost().getHostAddress();
-            this.addService(rpcServiceConfig);
             // 将服务注册到zookeeper
+            this.addService(rpcServiceConfig);
             serviceRegistry.registerService(rpcServiceConfig.getRpcServiceName(), new InetSocketAddress(host, NettyRpcServer.PORT));
         } catch (UnknownHostException e) {
             log.error("occur exception when get host address", e);

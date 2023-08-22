@@ -31,6 +31,7 @@ public class SocketRpcClient implements RpcRequestTransport {
 
     @Override
     public Object sendRpcRequest(RpcRequest request){
+        // 获取目标服务的远程socket连接
         InetSocketAddress inetSocketAddress = serviceDiscovery.lookupService(request);
         try(Socket socket = new Socket()) {
             //socket connect server

@@ -7,6 +7,7 @@ import org.apache.curator.framework.CuratorFramework;
 import java.net.InetSocketAddress;
 
 /**
+ * 将服务注册到zookeeper中
  * @author sunzy
  * @date 2023/8/5 16:26
  */

@@ -19,6 +19,12 @@ public class ConsistentHashLoadBalance extends AbstractLoadBalance {
 
     private final ConcurrentHashMap<String, ConsistentHashSelector> selectors = new ConcurrentHashMap<>();
 
+    /**
+     * 根据hash算法计算结果选择服务
+     * @param serviceAddresses
+     * @param rpcRequest
+     * @return
+     */
     @Override
     protected String doSelect(List<String> serviceAddresses, RpcRequest rpcRequest) {
         int identityHashCode = System.identityHashCode(serviceAddresses);
