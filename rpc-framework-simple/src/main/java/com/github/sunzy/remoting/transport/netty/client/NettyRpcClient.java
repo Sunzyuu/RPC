@@ -4,7 +4,6 @@ import com.github.sunzy.enums.CompressTypeEnum;
 import com.github.sunzy.enums.SerializationTypeEnum;
 import com.github.sunzy.enums.ServiceDiscoveryEnum;
 import com.github.sunzy.extension.ExtensionLoader;
-import com.github.sunzy.extension.SPI;
 import com.github.sunzy.factory.SingletonFactory;
 import com.github.sunzy.registry.ServiceDiscovery;
 import com.github.sunzy.remoting.constants.RpcConstants;

@@ -21,8 +21,14 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Slf4j
 public final class ExtensionLoader<T> {
 
+    /**
+     * 保存service的相关包路径
+     */
     private static final String SERVICE_DIRECTORY = "META-INF/extensions/";
     private static final Map<Class<?>, ExtensionLoader<?>> EXTENSION_LOADERS = new ConcurrentHashMap<>();
+    /**
+     * 获取到的扩展实例,能够减少加载次数
+     */
     private static final Map<Class<?>, Object> EXTENSION_INSTANCES = new ConcurrentHashMap<>();
 
     private final Class<?> type;
@@ -40,6 +46,7 @@ public final class ExtensionLoader<T> {
         if (!type.isInterface()) {
             throw new IllegalArgumentException("Extension type must be an interface.");
         }
+        // 查看改类是否有SPI注释判断其是否为扩展类
         if (type.getAnnotation(SPI.class) == null) {
             throw new IllegalArgumentException("Extension type must be annotated by @SPI");
         }
@@ -103,7 +110,7 @@ public final class ExtensionLoader<T> {
                 classes = cachedClasses.get();
                 if (classes == null) {
                     classes = new HashMap<>();
-                    // load all extensions from our extensions directory
+                    // load all extensions from  extensions directory
                     loadDirectory(classes);
                     cachedClasses.set(classes);
                 }
@@ -148,6 +155,7 @@ public final class ExtensionLoader<T> {
                         String clazzName = line.substring(ei + 1).trim();
                         // our SPI use key-value pair so both of them must not be empty
                         if (name.length() > 0 && clazzName.length() > 0) {
+                            // 从文件系统中加载类,然后放入到map中使用
                             Class<?> clazz = classLoader.loadClass(clazzName);
                             extensionClasses.put(name, clazz);
                         }
