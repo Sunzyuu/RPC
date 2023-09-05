@@ -13,6 +13,7 @@ import org.springframework.core.type.StandardAnnotationMetadata;
 import org.springframework.stereotype.Component;
 
 /**
+ * 通过自定义的扫描器（CustomScanner）扫描指定包路径下的类，并将符合条件的类注册为 Spring Bean
  * @author sunzy
  * date 2023-08-20
  */
@@ -23,13 +24,21 @@ public class CustomScannerRegistry implements ImportBeanDefinitionRegistrar, Res
     private ResourceLoader resourceLoader;
 
 
-
+    /**
+     * 用于设置资源加载器，以便在后续的扫描过程中使用
+     * @param resourceLoader the ResourceLoader object to be used by this object
+     */
     @Override
     public void setResourceLoader(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
 
     }
 
+    /**
+     *
+     * @param annotationMetadata annotation metadata of the importing class
+     * @param beanDefinitionRegistry current bean definition registry
+     */
     @Override
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
         //get the attributes and values of RpcScan annotation

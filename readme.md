@@ -161,3 +161,12 @@ public class SocketClientMain {
 }
 ```
 
+
+
+执行结果
+
+![image-20230905171045468](image/image-20230905171045468.png)
+
+
+
+![image-20230905171154527](image/image-20230905171154527.png)

@@ -74,6 +74,7 @@ public class ZkServiceProviderImpl implements ServiceProvider {
     public void publishService(RpcServiceConfig rpcServiceConfig) {
         try {
             String host = InetAddress.getLocalHost().getHostAddress();
+//            host = "127.0.0.1";
             // 将服务注册到zookeeper
             this.addService(rpcServiceConfig);
             serviceRegistry.registerService(rpcServiceConfig.getRpcServiceName(), new InetSocketAddress(host, NettyRpcServer.PORT));

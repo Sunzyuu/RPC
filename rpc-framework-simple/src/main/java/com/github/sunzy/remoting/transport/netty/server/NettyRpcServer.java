@@ -76,6 +76,7 @@ public class NettyRpcServer {
                     });
 
             // 绑定端口，同步等待绑定成功
+//            ChannelFuture f = b.bind("127.0.0.1", PORT).sync();
             ChannelFuture f = b.bind(host, PORT).sync();
             // 等待服务端监听端口关闭
             f.channel().closeFuture().sync();

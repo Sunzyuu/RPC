@@ -1,5 +1,9 @@
 package com.github.sunzy.registry.zk;
 
+import com.github.sunzy.enums.LoadBalanceEnum;
+import com.github.sunzy.enums.RpcErrorMessageEnum;
+import com.github.sunzy.exception.RpcException;
+import com.github.sunzy.extension.ExtensionLoader;
 import com.github.sunzy.loadbalance.LoadBalance;
 import com.github.sunzy.loadbalance.loadbalancer.RandomLoadBalance;
 import com.github.sunzy.registry.ServiceDiscovery;
@@ -12,6 +16,8 @@ import org.apache.curator.framework.CuratorFramework;
 import java.net.InetSocketAddress;
 import java.util.List;
 
+import static com.github.sunzy.extension.ExtensionLoader.*;
+
 /**
  * @author sunzy
  * @date 2023/8/3 22:42
@@ -21,9 +27,8 @@ public class ZkServiceDiscoveryImpl implements ServiceDiscovery {
     private final LoadBalance loadBalance;
 
     public ZkServiceDiscoveryImpl() {
-        this.loadBalance = new RandomLoadBalance();
+        this.loadBalance = getExtensionLoader(LoadBalance.class).getExtension(LoadBalanceEnum.LOADBALANCE.getName());
     }
-
     /**
      * 将客户端请求的服务从zookeeper中取出，进行调用
      * @param rpcRequest
@@ -34,16 +39,16 @@ public class ZkServiceDiscoveryImpl implements ServiceDiscovery {
         String rpcServiceName = rpcRequest.getRpcServiceName();
         CuratorFramework zkClient = CuratorUtils.getZkClient();
         List<String> serviceUrlList = CuratorUtils.getChildrenNodes(zkClient, rpcServiceName);
-        if(CollectionUtil.isEmpty(serviceUrlList)) {
-            throw new IllegalArgumentException("服务列表为空");
+        if (CollectionUtil.isEmpty(serviceUrlList)) {
+            throw new RpcException(RpcErrorMessageEnum.SERVICE_CAN_NOT_BE_FOUND, rpcServiceName);
         }
-        // 使用负载均衡
+        // load balancing
         String targetServiceUrl = loadBalance.selectServiceAddress(serviceUrlList, rpcRequest);
         log.info("Successfully found the service address:[{}]", targetServiceUrl);
         String[] socketAddressArray = targetServiceUrl.split(":");
         String host = socketAddressArray[0];
+//        host = "127.0.0.1";
         int port = Integer.parseInt(socketAddressArray[1]);
         return new InetSocketAddress(host, port);
-
     }
 }

@@ -11,6 +11,7 @@ import java.lang.annotation.*;
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
+//  Spring 框架中引入其他配置类或组件
 @Import(CustomScannerRegistry.class)
 @Documented
 public @interface RpcScan {

@@ -35,6 +35,11 @@ public class RpcClientProxy implements InvocationHandler {
         this.rpcServiceConfig = rpcServiceConfig;
     }
 
+    public RpcClientProxy(RpcRequestTransport rpcRequestTransport) {
+        this.rpcRequestTransport = rpcRequestTransport;
+        this.rpcServiceConfig = new RpcServiceConfig();
+    }
+
     /**
      * get the proxy object
      * @param clazz
