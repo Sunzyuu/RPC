@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
  * date 2023-08-20
  */
 @Slf4j
-public class CustomScannerRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware {
+public class CustomScannerRegistry implements ImportBeanDefinitionRegistrar, ResourceLoaderAware {
     private static final String SPRING_BEAN_BASE_PACKAGE = "com.github.sunzy";
     private static final String BASE_PACKAGE_ATTRIBUTE_NAME = "basePackage";
     private ResourceLoader resourceLoader;

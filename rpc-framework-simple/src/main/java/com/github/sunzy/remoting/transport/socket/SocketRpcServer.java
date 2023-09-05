@@ -21,6 +21,7 @@ public class SocketRpcServer {
     private final ExecutorService threadPool;
     private final ServiceProvider serviceProvider;
     public SocketRpcServer() {
+        // 初始化线程池
         threadPool = ThreadPoolFactoryUtil.createCustomThreadPoolIfAbsent("socket-server-rpc-pool");
         serviceProvider = SingletonFactory.getInstance(ZkServiceProviderImpl.class);
     }
@@ -29,6 +30,10 @@ public class SocketRpcServer {
         serviceProvider.publishService(rpcServiceConfig);
     }
 
+    /**
+     * 启动Socket服务端 等待客户端链接
+     * provider启动
+     */
     public void start() {
         try(ServerSocket server = new ServerSocket()) {
             String host = InetAddress.getLocalHost().getHostAddress();
@@ -37,6 +42,7 @@ public class SocketRpcServer {
 
             while((socket = server.accept()) != null) {
                 log.info("client connected [{}]", socket.getInetAddress());
+                // 使用线程池提高处理能力
                 threadPool.execute(new SocketRpcRequestHandlerRunnable(socket));
             }
             threadPool.shutdown();

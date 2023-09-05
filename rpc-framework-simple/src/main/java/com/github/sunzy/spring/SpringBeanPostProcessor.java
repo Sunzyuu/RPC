@@ -34,6 +34,16 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
         this.rpcClient = ExtensionLoader.getExtensionLoader(RpcRequestTransport.class).getExtension(RpcRequestTransportEnum.NETTY.getName());
     }
 
+    /**
+     *  在每个 Bean 初始化之前被调用。该方法检查当前 Bean 是否被标记为 @RpcService 注解，
+     *  如果是，就将该服务发布到服务提供者。也就是说，
+     *  当一个带有 @RpcService 注解的 Bean 在 Spring 容器中被初始化之前，
+     *  该方法会将它注册为一个可供远程调用的服务。
+     * @param bean the new bean instance
+     * @param beanName the name of the bean
+     * @return
+     * @throws BeansException
+     */
     @SneakyThrows
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
@@ -51,6 +61,16 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
         return bean;
     }
 
+    /**
+     * 在每个 Bean 初始化之后被调用。该方法检查当前 Bean 是否有属性被标记为 @RpcReference 注解，如果有，
+     * 就创建一个 RPC 客户端代理，并将代理赋值给属性。
+     * 换句话说，当一个 Bean 初始化完成后，该方法会检查它是否有需要远程引用的属性，并创建代理对象，
+     * 以便在需要时进行远程调用
+     * @param bean the new bean instance
+     * @param beanName the name of the bean
+     * @return
+     * @throws BeansException
+     */
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         Class<?> targetClass = bean.getClass();

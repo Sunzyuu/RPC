@@ -1,6 +1,6 @@
 package com.github.sunzy.annotation;
 
-import com.github.sunzy.spring.CustomScannerRegistrar;
+import com.github.sunzy.spring.CustomScannerRegistry;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -11,7 +11,7 @@ import java.lang.annotation.*;
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-@Import(CustomScannerRegistrar.class)
+@Import(CustomScannerRegistry.class)
 @Documented
 public @interface RpcScan {
     String[] basePackage();

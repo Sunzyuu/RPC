@@ -30,8 +30,10 @@ public final class SocketRpcRequestHandlerRunnable implements Runnable {
         log.info("server handle message from client by thread: [{}]", Thread.currentThread().getName());
         try (ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream())) {
+            // 从socket中获取客户端的请求信息,并转换成RpcRequest对象
             RpcRequest rpcRequest = (RpcRequest) objectInputStream.readObject();
             Object result = rpcRequestHandler.handle(rpcRequest);
+            // 向客户端返回执行结果
             objectOutputStream.writeObject(RpcResponse.success(result, rpcRequest.getRequestId()));
             objectOutputStream.flush();
         } catch (IOException | ClassNotFoundException e) {

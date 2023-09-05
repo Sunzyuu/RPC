@@ -23,7 +23,9 @@ public class RpcRequestHandler {
     }
 
     public Object handle(RpcRequest request) {
+        // 服务发现,从注册中心根据接口名,版本号获取到相应的服务对象
         Object service = serviceProvider.getService(request.getRpcServiceName());
+        // 通过反射调用目标对象的方法
         return invokeTargetMethod(request, service);
     }
 
@@ -32,6 +34,7 @@ public class RpcRequestHandler {
         Object result = null;
 
         try {
+            // 反射调用
             Method method = service.getClass().getMethod(rpcRequest.getMethodName(), rpcRequest.getParamTypes());
             result = method.invoke(service, rpcRequest.getParameters());
             log.info("service:[{}] successful invoke method:[{}]", rpcRequest.getInterfaceName(), rpcRequest.getMethodName());
@@ -42,7 +45,7 @@ public class RpcRequestHandler {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
-
+        // 返回执行结果
         return result;
 
     }

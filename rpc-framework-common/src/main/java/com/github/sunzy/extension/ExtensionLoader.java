@@ -22,7 +22,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public final class ExtensionLoader<T> {
 
     /**
-     * 保存service的相关包路径
+     * SPI extension loader dir
      */
     private static final String SERVICE_DIRECTORY = "META-INF/extensions/";
     private static final Map<Class<?>, ExtensionLoader<?>> EXTENSION_LOADERS = new ConcurrentHashMap<>();
@@ -39,6 +39,12 @@ public final class ExtensionLoader<T> {
         this.type = type;
     }
 
+    /**
+     * 根据SPI机制 加载扩展
+     * @param type
+     * @return
+     * @param <S>
+     */
     public static <S> ExtensionLoader<S> getExtensionLoader(Class<S> type) {
         if (type == null) {
             throw new IllegalArgumentException("Extension type should not be null.");
